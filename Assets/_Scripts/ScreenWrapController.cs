@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScreenWrapController : MonoBehaviour
-{
+public class ScreenWrapController : MonoBehaviour {
 	private Renderer[] renderers;
 	private bool isWrappingX = false;
 	private bool isWrappingY = false;
@@ -13,8 +12,10 @@ public class ScreenWrapController : MonoBehaviour
 	private Camera mainCamera;
 	private Transform[] ghosts;
 
-	void Start ()
-	{
+	[SerializeField]
+	private ScreenBounds bounds;
+
+	void Start () {
 		renderers = gameObject.GetComponentsInChildren<Renderer> ();
 		mainCamera = Camera.main;
 		ghosts = new Transform[8];
@@ -23,57 +24,38 @@ public class ScreenWrapController : MonoBehaviour
 		PositionGhostEntities ();
 	}
 
-	void FixedUpdate ()
-	{
+	void FixedUpdate () {
 		ScreenWrap ();
 	}
 		
 	void ScreenWrap()
 	{
-		//0,0 is middle of screen
-		float screenTop = screenHeight / 2;
-		float screenBottom = -screenTop;
-		float screenRight = screenWidth / 2;
-		float screenLeft = -screenRight;
-		
+		isVisible = ObjectOnScreen(gameObject.transform.position);
 
-		isVisible = CheckRenderers ();
-
-		if (isVisible)
-		{
+		if (isVisible) {
 			isWrappingX = false;
 			isWrappingY = false;
 			return;
 		}
 
-		if (isWrappingX && isWrappingY) {
-			return;
-		}
-
 		Vector3 newPosition = transform.position;
 
-		if (newPosition.x > screenRight || newPosition.x < screenLeft)
-		{
+		if (newPosition.x > bounds.right || newPosition.x < bounds.left) {
 			newPosition.x = -newPosition.x;
 			isWrappingX = true;
 			SwapEntities ();
 		}
 
-		if (newPosition.y > screenTop || newPosition.y < screenBottom)
-		{
+		if (newPosition.y > bounds.top || newPosition.y < bounds.bottom) {
 			newPosition.y = -newPosition.y;
 			isWrappingY = true;
 			SwapEntities ();
 		}
-
 	}
 
-	bool CheckRenderers()
-	{
-		foreach(Renderer renderer in renderers)
-		{
-			if (renderer.isVisible)
-			{
+	bool CheckRenderers() {
+		foreach(Renderer renderer in renderers) {
+			if (renderer.isVisible) {
 				return true;
 			}
 		}
@@ -87,20 +69,24 @@ public class ScreenWrapController : MonoBehaviour
 
 		screenWidth = screenTopRight.x - screenBottomLeft.x;
 		screenHeight = screenTopRight.y - screenBottomLeft.y;
+
+		bounds = new ScreenBounds();
+		bounds.top = screenHeight / 2;
+		bounds.bottom = screenHeight / -2;
+		bounds.right = screenWidth / 2;
+		bounds.left = screenWidth / -2;
 	}
 
-	void CreateGhostEntities()
-	{
-		for(int i = 0; i < 8; i++)
-		{
+	void CreateGhostEntities() {
+		for( int i = 0; i < 8; i++ ) {
 			Transform ghost = Instantiate(transform, Vector3.zero, Quaternion.identity) as Transform;
 			Collider2D ghostCollider = ghost.GetComponent<Collider2D> ();
 
 			ghost.name = transform.name + "-ghost-" + i;
 			ghostCollider.enabled = false;
 			DestroyImmediate(ghost.GetComponent<ScreenWrapController>());
-			if (ghost.GetComponent<WeaponController>() != null)
-			{
+			
+			if (ghost.GetComponent<WeaponController>() != null) {
 				DestroyImmediate(ghost.GetComponent<WeaponController>());
 			}
 			
@@ -108,8 +94,7 @@ public class ScreenWrapController : MonoBehaviour
 		}
 	}
 
-	void PositionGhostEntities()
-	{
+	void PositionGhostEntities() {
 		var ghostPosition = transform.position;
 
 		// We're positioning the ghosts clockwise behind the edges of the screen.
@@ -160,13 +145,10 @@ public class ScreenWrapController : MonoBehaviour
 		}
 	}
 
-	void SwapEntities()
-	{
-		foreach(Transform ghost in ghosts)
-		{
-			if (ghost.position.x < screenWidth && ghost.position.x > -screenWidth &&
-				ghost.position.y < screenHeight && ghost.position.y > -screenHeight)
-			{
+	void SwapEntities() {
+		foreach(Transform ghost in ghosts) {
+
+			if (ObjectOnScreen(ghost.position)) {
 				transform.position = ghost.position;
 
 				break;
@@ -175,4 +157,20 @@ public class ScreenWrapController : MonoBehaviour
 
 		PositionGhostEntities();
 	}
+
+	bool ObjectOnScreen(Vector3 position) {
+		return 	position.x < bounds.right && 
+				position.x > bounds.left &&
+				position.y < bounds.top && 
+				position.y > bounds.bottom;
+	}
+}
+
+[System.SerializableAttribute]
+public class ScreenBounds {
+	public float top;
+	public float bottom;
+	public float left;
+	public float right;
+
 }

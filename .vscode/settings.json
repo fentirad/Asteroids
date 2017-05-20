@@ -51,6 +51,9 @@
         "Obj/":true,
         "ProjectSettings/":true,
         "temp/":true,
-        "Temp/":true
+        "Temp/":true,
+        "Assets/_Scenes":true,
+        "Assets/Prefabs":true,
+        "Assets/Textures":true
     }
 }
