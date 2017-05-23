@@ -16,7 +16,7 @@ public class ScreenWrapController : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		transform.position = screenWrap.WrapObject(transform.position, transform.rotation);
+		transform.position = screenWrap.UpdatePosition(transform.position, transform.rotation);
 	}
 
 	void SetScreenWrap(IScreenWrap screenWrap) {

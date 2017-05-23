@@ -11,6 +11,7 @@ public class ScreenWrap : IScreenWrap {
 
 	public ScreenBounds Bounds {
 		get { return bounds; }
+		set {bounds = value; }
 	}
 
 	public ScreenWrap() {
@@ -30,7 +31,7 @@ public class ScreenWrap : IScreenWrap {
 		this.bounds.left = screenWidth / -2;
 	}
 
-	public Vector3 WrapObject(Vector3 objectPosition, Quaternion objectRotation) {
+	public Vector3 UpdatePosition(Vector3 objectPosition, Quaternion objectRotation) {
 		bool isVisible = this.ObjectOnScreen(objectPosition);
 
 		if (isVisible) {
@@ -66,6 +67,7 @@ public class ScreenWrap : IScreenWrap {
 			Collider2D ghostCollider = ghost.GetComponent<Collider2D> ();
 
 			ghost.name = baseTransform.name + "-ghost-" + i;
+			
 			ghostCollider.enabled = false;
 			GameObject.DestroyImmediate(ghost.GetComponent<ScreenWrapController>());
 
