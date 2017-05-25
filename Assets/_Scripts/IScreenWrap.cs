@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface IScreenWrap {
-	ScreenBounds Bounds { get; }
+	ScreenBounds Bounds { get; set; }
 
 	void CalculateScreenSize(Camera mainCamera, Vector3 position);
 	Vector3 UpdatePosition(Vector3 objectPosition, Quaternion objectRotation);

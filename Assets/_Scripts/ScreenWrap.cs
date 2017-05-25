@@ -11,7 +11,7 @@ public class ScreenWrap : IScreenWrap {
 
 	public ScreenBounds Bounds {
 		get { return bounds; }
-		set {bounds = value; }
+		set { bounds = value; }
 	}
 
 	public ScreenWrap() {
@@ -54,10 +54,10 @@ public class ScreenWrap : IScreenWrap {
 	}
 
 	public bool ObjectOnScreen(Vector3 position) {
-		return 	position.x < Bounds.right && 
-				position.x > Bounds.left &&
-				position.y < Bounds.top && 
-				position.y > Bounds.bottom;
+		return 	position.x <= Bounds.right && 
+				position.x >= Bounds.left &&
+				position.y <= Bounds.top && 
+				position.y >= Bounds.bottom;
 	}
 
 	public void CreateGhostEntities(Transform baseTransform) {
@@ -79,7 +79,7 @@ public class ScreenWrap : IScreenWrap {
 		}
 	}
 
-	public Vector3 SwapEntities(Vector3 basePosition, Quaternion baseRotation) {
+	public virtual Vector3 SwapEntities(Vector3 basePosition, Quaternion baseRotation) {
 		foreach(Transform ghost in ghosts) {
 
 			if (ObjectOnScreen(ghost.position)) {
