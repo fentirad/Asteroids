@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
 	public float thrustSpeed;
 	public float rotateSpeed;
+	public float maxSpeed;
 
 	private Rigidbody2D rb;
 	
@@ -14,13 +15,17 @@ public class PlayerController : MonoBehaviour
 	}
 		
 	void FixedUpdate () {
-		float thrust = Input.GetAxis ("Vertical");
+		float thrust = Input.GetAxisRaw ("Vertical");
 		float rotation = Input.GetAxis ("Horizontal");
 		thrust = Mathf.Clamp (thrust, 0, 1);
-
-		rb.rotation += (-rotation * rotateSpeed);
-
 		Vector2 direction = new Vector2(transform.up.x, transform.up.y);
-		rb.velocity = direction * thrustSpeed * thrust;
+
+		if (thrust > 0 && rb.velocity.magnitude <= maxSpeed) {
+			rb.velocity += (direction * thrustSpeed * thrust);
+		}
+		else {
+			rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
+		}
+		rb.rotation += (-rotation * rotateSpeed);
 	}
 }
