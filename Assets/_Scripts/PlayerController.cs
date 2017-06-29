@@ -7,25 +7,33 @@ public class PlayerController : MonoBehaviour
 	public float thrustSpeed;
 	public float rotateSpeed;
 	public float maxSpeed;
+	public IThrusters thrusters;
 
 	private Rigidbody2D rb;
 	
 	void Start () {
 		rb = gameObject.GetComponent<Rigidbody2D> ();
+		SetThrusters(new Thrusters());
 	}
 		
 	void FixedUpdate () {
 		float thrust = Input.GetAxisRaw ("Vertical");
-		float rotation = Input.GetAxis ("Horizontal");
-		thrust = Mathf.Clamp (thrust, 0, 1);
+		float rotation = Input.GetAxisRaw ("Horizontal");
 		Vector2 direction = new Vector2(transform.up.x, transform.up.y);
 
-		if (thrust > 0 && rb.velocity.magnitude <= maxSpeed) {
-			rb.velocity += (direction * thrustSpeed * thrust);
+		rb.velocity = thrusters.MoveForward(thrust, direction, rb.velocity, maxSpeed, thrustSpeed);
+		rb.rotation = thrusters.Turn(rotation, rb.rotation, rotateSpeed);
+	}
+
+	void OnCollisionEnter2D(Collision2D coll) {
+		Debug.Log("PlayerController: " + coll.gameObject.tag);
+		if (coll.gameObject.tag.Equals("Hazard")) {
+			//Send message to destroy this gameobject as well as all ghosts
+			//Destroy(gameObject);
 		}
-		else {
-			rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
-		}
-		rb.rotation += (-rotation * rotateSpeed);
+    }
+
+	void SetThrusters(IThrusters thrusters) {
+		this.thrusters = thrusters;
 	}
 }
