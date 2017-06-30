@@ -75,6 +75,10 @@ public class ScreenWrap : IScreenWrap {
 				GameObject.DestroyImmediate(ghost.GetComponent<WeaponController>());
 			}
 
+			if (ghost.GetComponent<AsteroidAI>() != null) {
+				GameObject.DestroyImmediate(ghost.GetComponent<AsteroidAI>());
+			}
+
 			ghosts[i] = ghost;
 		}
 	}
